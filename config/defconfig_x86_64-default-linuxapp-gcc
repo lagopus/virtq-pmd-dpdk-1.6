@@ -209,6 +209,12 @@ CONFIG_RTE_LIBRTE_PMD_PCAP=n
 CONFIG_RTE_LIBRTE_PMD_XENVIRT=n
 
 #
+# Compile virtqueue PMD driver
+# (Enable pcap pmd also)
+#
+CONFIG_RTE_LIBRTE_PMD_VIRTQ=n
+
+#
 # Do prefetch of packet data within PMD driver receive function
 #
 CONFIG_RTE_PMD_PACKET_PREFETCH=y

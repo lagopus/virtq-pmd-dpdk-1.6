@@ -1,13 +1,14 @@
 /*-
  *   BSD LICENSE
- * 
- *   Copyright(c) 2010-2014 Intel Corporation. All rights reserved.
+ *
+ *   Copyright(c) 2010-2013 Intel Corporation. All rights reserved.
+ *   Copyright (C) 2014 Nippon Telegraph and Telephone Corporation.
  *   All rights reserved.
- * 
+ *
  *   Redistribution and use in source and binary forms, with or without
  *   modification, are permitted provided that the following conditions
  *   are met:
- * 
+ *
  *     * Redistributions of source code must retain the above copyright
  *       notice, this list of conditions and the following disclaimer.
  *     * Redistributions in binary form must reproduce the above copyright
@@ -17,7 +18,7 @@
  *     * Neither the name of Intel Corporation nor the names of its
  *       contributors may be used to endorse or promote products derived
  *       from this software without specific prior written permission.
- * 
+ *
  *   THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  *   "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
  *   LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
@@ -31,72 +32,17 @@
  *   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <inttypes.h>
-#include <rte_string_fns.h>
-#ifdef RTE_LIBRTE_PMD_RING
-#include <rte_eth_ring.h>
-#endif
-#ifdef RTE_LIBRTE_PMD_PCAP
-#include <rte_eth_pcap.h>
-#endif
-#ifdef RTE_LIBRTE_PMD_XENVIRT
-#include <rte_eth_xenvirt.h>
-#endif
-#ifdef RTE_LIBRTE_PMD_VIRTQ
-#include <rte_eth_virtq.h>
-#endif
-#include "eal_private.h"
+#ifndef _RTE_ETH_VIRTQ_THREAD_H_
+#define _RTE_ETH_VIRTQ_THREAD_H_
 
-struct device_init {
-	const char *dev_prefix;
-	int (*init_fn)(const char*, const char *);
-};
+#ifdef __cplusplus
+extern "C" {
+#endif
 
-#define NUM_DEV_TYPES (sizeof(dev_types)/sizeof(dev_types[0]))
-struct device_init dev_types[] = {
-#ifdef RTE_LIBRTE_PMD_RING
-		{
-			.dev_prefix = RTE_ETH_RING_PARAM_NAME,
-			.init_fn = rte_pmd_ring_init
-		},
-#endif
-#ifdef RTE_LIBRTE_PMD_PCAP
-		{
-			.dev_prefix = RTE_ETH_PCAP_PARAM_NAME,
-			.init_fn = rte_pmd_pcap_init
-		},
-#endif
-#ifdef RTE_LIBRTE_PMD_XENVIRT
-		{
-			.dev_prefix = RTE_ETH_XENVIRT_PARAM_NAME,
-			.init_fn = rte_pmd_xenvirt_init
-		},
-#endif
-#ifdef RTE_LIBRTE_PMD_VIRTQ
-		{
-			.dev_prefix = RTE_ETH_VIRTQ_PARAM_NAME,
-			.init_fn = rte_pmd_virtq_init
-		},
-#endif
-		{
-			.dev_prefix = "-nodev-",
-			.init_fn = NULL
-		}
-};
+int virtq_thread_set_affinity(unsigned);
 
-int
-rte_eal_non_pci_ethdev_init(void)
-{
-	uint8_t i, j;
-	for (i = 0; i < NUM_DEV_TYPES; i++) {
-		for (j = 0; j < RTE_MAX_ETHPORTS; j++) {
-			const char *params;
-			char buf[16];
-			rte_snprintf(buf, sizeof(buf), "%s%"PRIu8,
-					dev_types[i].dev_prefix, j);
-			if (eal_dev_is_whitelisted(buf, &params))
-				dev_types[i].init_fn(buf, params);
-		}
-	}
-	return 0;
+#ifdef __cplusplus
 }
+#endif
+
+#endif /* _RTE_ETH_VIRTQ_THREAD_H_ */

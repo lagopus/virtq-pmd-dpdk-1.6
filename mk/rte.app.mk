@@ -169,6 +169,10 @@ ifeq ($(CONFIG_RTE_LIBRTE_PMD_PCAP),y)
 LDLIBS += -lrte_pmd_pcap -lpcap
 endif
 
+ifeq ($(CONFIG_RTE_LIBRTE_PMD_VIRTQ),y)
+LDLIBS += -lrte_pmd_virtq
+endif
+
 LDLIBS += $(EXECENV_LDLIBS)
 
 LDLIBS += --end-group
