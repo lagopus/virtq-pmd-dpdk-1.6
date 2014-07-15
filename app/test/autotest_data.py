@@ -335,6 +335,12 @@ parallel_test_group_list = [
 		 "Report" :	None,
 		},
 		{
+		 "Name" :	"PMD virtq autotest",
+		 "Command" :	"virtq_pmd_autotest",
+		 "Func" :	default_autotest,
+		 "Report" :	None,
+		},
+		{
 		 "Name" :	"Access list control autotest",
 		 "Command" : 	"acl_autotest",
 		 "Func" :	default_autotest,

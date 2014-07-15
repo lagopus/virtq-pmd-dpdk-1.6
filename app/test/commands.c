@@ -181,6 +181,10 @@ static void cmd_autotest_parsed(void *parsed_result,
 	if (!strcmp(res->autotest, "ring_pmd_autotest"))
 		ret = test_pmd_ring();
 #endif /* RTE_LIBRTE_PMD_RING */
+#ifdef RTE_LIBRTE_PMD_VIRTQ
+	if (!strcmp(res->autotest, "virtq_pmd_autotest"))
+		ret = test_pmd_virtq();
+#endif /* RTE_LIBRTE_PMD_VIRTQ */
 
 #ifdef RTE_LIBRTE_ACL
 	if (!strcmp(res->autotest, "acl_autotest"))
@@ -225,6 +229,9 @@ cmdline_parse_token_string_t cmd_autotest_autotest =
 			"timer_perf_autotest#"
 #ifdef RTE_LIBRTE_PMD_RING
 			"ring_pmd_autotest#"
+#endif
+#ifdef RTE_LIBRTE_PMD_VIRTQ
+			"virtq_pmd_autotest#"
 #endif
 			"common_autotest");
 
