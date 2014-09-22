@@ -45,7 +45,6 @@ SRCS-$(CONFIG_RTE_LIBRTE_PMD_VIRTQ) += rte_eth_virtq_vmmapi.c
 SRCS-$(CONFIG_RTE_LIBRTE_PMD_VIRTQ) += rte_eth_virtq_pci_virtio_net.c
 SRCS-$(CONFIG_RTE_LIBRTE_PMD_VIRTQ) += rte_eth_virtq_thread.c
 SRCS-$(CONFIG_RTE_LIBRTE_PMD_VIRTQ) += ipc_node.c
-SRCS-$(CONFIG_RTE_LIBRTE_PMD_VIRTQ) += ../librte_pmd_pcap/rte_eth_pcap_arg_parser.c
 
 CFLAGS_rte_eth_virtq_thread.o := -D_GNU_SOURCE
 
@@ -57,6 +56,5 @@ SYMLINK-y-include += rte_eth_virtq.h
 # this lib depends upon:
 DEPDIRS-$(CONFIG_RTE_LIBRTE_PMD_VIRTQ) += lib/librte_eal lib/librte_ether
 DEPDIRS-$(CONFIG_RTE_LIBRTE_PMD_VIRTQ) += lib/librte_mempool lib/librte_mbuf
-DEPDIRS-$(CONFIG_RTE_LIBRTE_PMD_VIRTQ) += lib/librte_pmd_pcap
 
 include $(RTE_SDK)/mk/rte.lib.mk
