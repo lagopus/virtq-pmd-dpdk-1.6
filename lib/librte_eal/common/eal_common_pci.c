@@ -172,6 +172,8 @@ rte_eal_pci_probe(void)
 				rte_exit(EXIT_FAILURE, "Requested device " PCI_PRI_FMT
 						" cannot be used\n", dev->addr.domain,dev->addr.bus,
 						dev->addr.devid, dev->addr.function);
+		else
+			pci_probe_all_drivers(dev);
 
 	return 0;
 }
