@@ -138,7 +138,7 @@ virtq_pmd_virtq_rx(void *q, struct rte_mbuf **bufs, uint16_t nb_bufs)
 		 * iovecs and sending when an end-of-packet is found
 		 */
 		total_bytes += pci_vtnet_proctx(
-				sc, vq, 1, rx_queue->mb_pool, &mbuf);
+				sc, vq, 1, rx_queue->mb_pool, &mbuf, rx_queue->in_port);
 		if (mbuf == NULL)
 			break;
 
@@ -164,7 +164,8 @@ virtq_pmd_virtq_rx(void *q, struct rte_mbuf **bufs, uint16_t nb_bufs)
 
 inline uint64_t
 pci_vtnet_proctx(void *dev, struct vqueue_info *vq,
-		int send, struct rte_mempool *mb_pool, struct rte_mbuf **mbuf)
+		int send, struct rte_mempool *mb_pool,
+		struct rte_mbuf **mbuf, uint8_t in_port)
 {
 	struct pci_vtnet_softc *sc __rte_unused = (struct pci_vtnet_softc *)dev;
 	struct iovec iov[VTNET_MAXSEGS + 1];
@@ -205,6 +206,7 @@ pci_vtnet_proctx(void *dev, struct vqueue_info *vq,
 			}
 			(*mbuf)->pkt.data_len = plen;
 			(*mbuf)->pkt.pkt_len = (*mbuf)->pkt.data_len;
+			(*mbuf)->pkt.in_port = in_port;
 			(*mbuf)->pkt.nb_segs = 1;
 			(*mbuf)->pkt.next = NULL;
 		} else

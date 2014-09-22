@@ -86,7 +86,7 @@ struct virtio_net_rxhdr {
 int pci_vtnet_init(struct pci_devinst **pdev, void **dev);
 void pci_vtnet_close(void *dev);
 inline uint64_t pci_vtnet_proctx(void *dev, struct vqueue_info *vq,
-		int send, struct rte_mempool *mb_pool, struct rte_mbuf **mbuf);
+		int send, struct rte_mempool *mb_pool, struct rte_mbuf **mbuf, uint8_t in_port);
 uint16_t virtq_pmd_virtq_rx(void *q, struct rte_mbuf **bufs, uint16_t nb_bufs);
 uint16_t virtq_pmd_virtq_tx(void *q, struct rte_mbuf **bufs, uint16_t nb_bufs);
 

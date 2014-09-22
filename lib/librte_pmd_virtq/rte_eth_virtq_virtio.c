@@ -167,7 +167,7 @@ vi_vq_reconf(struct virtio_softc *vs, uint32_t pfn)
 	case 1:
 		vq->vq_last_avail = vq->vq_used->vu_idx;
 		while (vq->vq_avail->va_idx != vq->vq_used->vu_idx)
-			pci_vtnet_proctx(NULL, vq, 0, NULL, NULL);
+			pci_vtnet_proctx(NULL, vq, 0, NULL, NULL, 0);
 		vq->vq_save_used = vq->vq_used->vu_idx;
 		vq_endchains(vq, 1);
 		break;

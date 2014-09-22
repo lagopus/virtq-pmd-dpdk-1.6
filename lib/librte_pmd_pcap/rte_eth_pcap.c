@@ -60,6 +60,7 @@ static uint64_t hz;
 
 struct pcap_rx_queue {
 	pcap_t *pcap;
+	uint8_t in_port;
 	struct rte_mempool *mb_pool;
 	volatile unsigned long rx_pkts;
 	volatile unsigned long err_pkts;
@@ -149,6 +150,7 @@ eth_pcap_rx(void *queue,
 			rte_memcpy(mbuf->pkt.data, packet, header.len);
 			mbuf->pkt.data_len = (uint16_t)header.len;
 			mbuf->pkt.pkt_len = mbuf->pkt.data_len;
+			mbuf->pkt.in_port = pcap_q->in_port;
 			bufs[i] = mbuf;
 			num_rx++;
 		} else {
@@ -366,6 +368,7 @@ eth_rx_queue_setup(struct rte_eth_dev *dev,
 	struct pcap_rx_queue *pcap_q = &internals->rx_queue[rx_queue_id];
 	pcap_q->mb_pool = mb_pool;
 	dev->data->rx_queues[rx_queue_id] = pcap_q;
+	pcap_q->in_port = dev->data->port_id;
 	return 0;
 }
 

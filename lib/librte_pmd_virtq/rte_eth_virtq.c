@@ -264,6 +264,7 @@ eth_rx_queue_setup(struct rte_eth_dev *dev, uint16_t rx_queue_id,
 
 	rx_queue->mb_pool = mb_pool;
 	dev->data->rx_queues[rx_queue_id] = rx_queue;
+	rx_queue->in_port = dev->data->port_id;
 	return 0;
 }
 

@@ -81,6 +81,7 @@ struct virtq_dev {
 struct pmd_queue {
 	struct virtq_dev *vdev;
 	struct rte_mempool *mb_pool;
+	uint8_t in_port;
 
 	volatile unsigned long rx_pkts;
 	volatile unsigned long tx_pkts;
