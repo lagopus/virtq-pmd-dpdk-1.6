@@ -203,7 +203,7 @@ CONFIG_RTE_PMD_RING_MAX_TX_RINGS=16
 #
 # Compile software PMD backed by PCAP files
 #
-CONFIG_RTE_LIBRTE_PMD_PCAP=n
+CONFIG_RTE_LIBRTE_PMD_PCAP=y
 
 
 CONFIG_RTE_LIBRTE_PMD_XENVIRT=n
@@ -212,7 +212,7 @@ CONFIG_RTE_LIBRTE_PMD_XENVIRT=n
 # Compile virtqueue PMD driver
 # (Enable pcap pmd also)
 #
-CONFIG_RTE_LIBRTE_PMD_VIRTQ=n
+CONFIG_RTE_LIBRTE_PMD_VIRTQ=y
 
 #
 # Do prefetch of packet data within PMD driver receive function
