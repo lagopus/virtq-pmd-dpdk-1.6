@@ -41,53 +41,53 @@ As a result, virtq PMD can access to the buffers and queues directly. This is th
 - Download
  - QEMU
 
-            $ git clone https://github.com/lagopus/virtio-net-ipc-qemu1.0.git
+          $ git clone https://github.com/lagopus/virtio-net-ipc-qemu1.0.git
 
  - DPDK
 
-            $ git clone https://github.com/lagopus/virtq-pmd-dpdk.git
+          $ git clone https://github.com/lagopus/virtq-pmd-dpdk.git
 
 - Compile
  - QEMU
 
-            $ cd virtio-net-ipc-qemu1.0
-            $ ./configure --target-list=x86_64-softmmu
-            $ make
-            $ sudo make install
-            $ ls /usr/local/bin/qemu*
-            /usr/local/bin/qemu-ga
-            /usr/local/bin/qemu-img
-            /usr/local/bin/qemu-io
-            /usr/local/bin/qemu-nbd
-            /usr/local/bin/qemu-system-x86_64
+          $ cd virtio-net-ipc-qemu1.0
+          $ ./configure --target-list=x86_64-softmmu
+          $ make
+          $ sudo make install
+          $ ls /usr/local/bin/qemu*
+          /usr/local/bin/qemu-ga
+          /usr/local/bin/qemu-img
+          /usr/local/bin/qemu-io
+          /usr/local/bin/qemu-nbd
+          /usr/local/bin/qemu-system-x86_64
 
  - DPDK
 
-            $ cd virtq-pmd-dpdk
-            $ make install T=x86_64-default-linuxapp-gcc
+          $ cd virtq-pmd-dpdk
+          $ make install T=x86_64-default-linuxapp-gcc
 
 - Start QEMU
 
  Before starting, users needs to mount hugetlbfs. For example, to reserve 4G of hugepage memory in the form of four 1G pages,
  the following options should be passed to the kernel:
 
-        default_hugepagesz=1G hugepagesz=1G hugepages=4
+      default_hugepagesz=1G hugepagesz=1G hugepages=4
 
  Once the hugepage memory is reserved, to make the memory available for Intel DPDK use, perform the following steps:
 
-        $ mkdir /mnt/huge
-        $ mount -t hugetlbfs nodev /mnt/huge
+      $ mkdir /mnt/huge
+      $ mount -t hugetlbfs nodev /mnt/huge
 
  Here is an one of example to start guest with virtio-net-ipc-device.
 
-        $ sudo /usr/local/qemu/bin/qemu-system-x86_64 \
-          -machine pc-1.0 -cpu host,-x2apic \
-          -smp 4,sockets=2,cores=1,threads=1 \
-          -m 4096 -mem-path /mnt/huge/libvirt/qemu/ -mem-prealloc \
-          -drive file=vm.img,if=none,id=drive-virtio-disk0,format=raw \
-          -device virtio-blk-pci,bus=pci.0,addr=0x8,drive=drive-virtio-disk0,id=virtio-disk0,bootindex=2 \
-          -device virtio-net-ipc-pci,id=net0,mac=52:54:00:c6:a7:41,bus=pci.0,addr=0x09,nid=0,socketpath=/tmp/virtq,cinterval=1 \
-          -net none -enable-kvm -vnc localhost:0
+      $ sudo /usr/local/qemu/bin/qemu-system-x86_64 \
+        -machine pc-1.0 -cpu host,-x2apic \
+        -smp 4,sockets=2,cores=1,threads=1 \
+        -m 4096 -mem-path /mnt/huge/libvirt/qemu/ -mem-prealloc \
+        -drive file=vm.img,if=none,id=drive-virtio-disk0,format=raw \
+        -device virtio-blk-pci,bus=pci.0,addr=0x8,drive=drive-virtio-disk0,id=virtio-disk0,bootindex=2 \
+        -device virtio-net-ipc-pci,id=net0,mac=52:54:00:c6:a7:41,bus=pci.0,addr=0x09,nid=0,socketpath=/tmp/virtq,cinterval=1 \
+        -net none -enable-kvm -vnc localhost:0
 
  Users can specify options used by virtio-net-ipc devices. Additionally following options can be specified.
  - `virtio-net-ipc-pci` : Specify the virtual network device is "virtio-net-ipc device" with --device option.
@@ -110,8 +110,8 @@ As a result, virtq PMD can access to the buffers and queues directly. This is th
  Here is an example of starting DPDK application using virtq PMD. When the application starts, users can use virtq PMDs with "--use-device" option.
  Please see [DPDK manuals](http://dpdk.org/doc/guides/prog_guide/) for detail of this option.
 
-        $ sudo RTE_PMD_VIRTQ_CONNECTOR=/tmp/virtq ./build/app/testpmd -c f -n 4 -m 1024 --use-device \
-          'eth_virtq0;mac=00:01:02:03:04:05;lcore_id=1,eth_pcap0;iface=eth0' -- -i
+      $ sudo RTE_PMD_VIRTQ_CONNECTOR=/tmp/virtq ./build/app/testpmd -c f -n 4 -m 1024 --use-device \
+        'eth_virtq0;mac=00:01:02:03:04:05;lcore_id=1,eth_pcap0;iface=eth0' -- -i
 
  User can specify following options for virtq PMD.
  - `RTE_PMD_VIRTQ_CONNECTOR` : This has to be the same parameter as "socketpath" of QEMU.
@@ -140,8 +140,8 @@ As a result, virtq PMD can access to the buffers and queues directly. This is th
 
  Before restarting the application, users should finalize virtio-net-ipc device. To do that, type followings.
 
-        $ ./tools/pci_unbind -b virtio-pci <pci address of virtio-net-ipc device>
-        $ ./tools/pci_unbind -b igb_uio <pci address of virtio-net-ipc device>
+      $ ./tools/pci_unbind -b virtio-pci <pci address of virtio-net-ipc device>
+      $ ./tools/pci_unbind -b igb_uio <pci address of virtio-net-ipc device>
 
  Above commands will let the kernel virtio-net driver handle the device once, then bind to DPDK again. When the kernel driver binds the device, virtio-net-ipc device will be finalized and initialized.
 
@@ -164,9 +164,9 @@ Instruction is following:
 
  - lagopus
 
-            $ git clone https://github.com/lagopus/lagopus.git
-            $ cd lagopus
-            $ git checkout -b 0.1.1 refs/tags/v0.1.1
+          $ git clone https://github.com/lagopus/lagopus.git
+          $ cd lagopus
+          $ git checkout -b 0.1.1 refs/tags/v0.1.1
 
 - Apply patch to lagopus 0.1.1
  - patch file "lagopus.patch" is the following.
@@ -186,22 +186,22 @@ Instruction is following:
 
  - Apply patch to configure.ac
 
-            $ patch < lagopus.patch
+        $ patch < lagopus.patch
 
  - re-generate configure
 
-            $ aclocal
-            $ autoheader
-            $ automake
-            $ autoconf
+        $ aclocal
+        $ autoheader
+        $ automake
+        $ autoconf
 
 - Compile
 
    here is in lagopus directory, and you have to set "RTE_SDK" environment variable to "virtq-pmd-dpdk" directory. And then type the following command.
 
-            $ ./configure --with-dpdk-dir=${RTE_SDK}
-            $ make
-            $ sudo make install
+        $ ./configure --with-dpdk-dir=${RTE_SDK}
+        $ make
+        $ sudo make install
 
  More details of options, see [lagopus documentations](https://github.com/lagopus/lagopus/blob/master/QUICKSTART.md).
 
@@ -209,8 +209,8 @@ Instruction is following:
 
 - Here is an example which provides two virtual nic attached to lagopus. In this example, two physical nics are attached to DPDK igb_uio kernel module.
 
-            $ sudo RTE_PMD_VIRTQ_CONNECTOR=/tmp/virtq lagopus -d -- -c3 -n1 -m1024 --use-device 'eth_virtq0,eth_virtq1' -- -pf
-```json
+        $ sudo RTE_PMD_VIRTQ_CONNECTOR=/tmp/virtq lagopus -d -- -c3 -n1 -m1024 --use-device 'eth_virtq0,eth_virtq1' -- -pf
+```
 interface {
     ethernet {
         eth0;
