@@ -1,4 +1,4 @@
-#virtq-pmd-dpdk#
+##virtq-pmd-dpdk and virtio-net-ipc enabled QEMU##
 
 ###What is virtq-pmd-dpdk ?###
 virtq-pmd-dpdk is [Intel DPDK library](http://dpdk.org) with an additional virtio-based poll-mode driver (we call "virtq PMD") 
@@ -7,15 +7,18 @@ such as linux-bridge or tap driver.
 For direct communication between a DPDK application and virtual machine, It needs customized qemu emulator with an additional virtual network device (we call "virtio-net-ipc device").
 This is based on DPDK version 1.6.0-18.
 
+###What is virtio-net-ipc enabled QEMU ?###
+virtio-net-ipc enabled QEMU is qemu emulator with additional virtual network device "virtio-net-ipc device". This qemu emulator directly transfer data between guest and DPDK application with virtq-pmd-dpdk. This is based on QEMU version 1.0.
+
 ###What are virtq PMD and virtio-net-ipc device?###
 
 virtq PMD is a poll mode driver of DPDK, and virtio-net-ipc device is a kind of virtio-net device of QEMU. Those are used for establishing a fast path between a DPDK application on the host and a virtio-net driver on the guest. Both virtio-net drivers of linux kernel and virtio-net PMD of DPDK can be the virtio-net driver that virtq PMD connects. Frankly, it is almost similar to vhost-user of QEMU-2.1, but has a few features vhost-user doesn't have.
 
 ###Where can I download those from?###
 
-- DPDK-1.6 and virtq PMD
+- DPDK-1.6.0-18 with virtq PMD
  - https://github.com/lagopus/virtq-pmd-dpdk
-- QEMU-1.0 and virtio-net-ipc
+- QEMU-1.0 with virtio-net-ipc
  - https://github.com/lagopus/virtio-net-ipc-qemu1.0
 
 ###What are features?###
@@ -38,36 +41,42 @@ As a result, virtq PMD can access to the buffers and queues directly. This is th
 - Download
  - QEMU
 
-        $ git clone https://github.com/lagopus/virtio-net-ipc-qemu1.0.git
+            $ git clone https://github.com/lagopus/virtio-net-ipc-qemu1.0.git
 
  - DPDK
 
-        $ git clone https://github.com/lagopus/virtq-pmd-dpdk.git
+            $ git clone https://github.com/lagopus/virtq-pmd-dpdk.git
 
 - Compile
  - QEMU
 
-        $ cd virtio-net-ipc-qemu1.0
-        $ ./configure --target-list=x86_64-softmmu
-        $ make
-        $ sudo make install
-        $ ls /usr/local/bin/qemu*
-        /usr/local/bin/qemu-ga
-        /usr/local/bin/qemu-img
-        /usr/local/bin/qemu-io
-        /usr/local/bin/qemu-nbd
-        /usr/local/bin/qemu-system-x86_64 
+            $ cd virtio-net-ipc-qemu1.0
+            $ ./configure --target-list=x86_64-softmmu
+            $ make
+            $ sudo make install
+            $ ls /usr/local/bin/qemu*
+            /usr/local/bin/qemu-ga
+            /usr/local/bin/qemu-img
+            /usr/local/bin/qemu-io
+            /usr/local/bin/qemu-nbd
+            /usr/local/bin/qemu-system-x86_64
 
  - DPDK
 
-        $ cd virtq-pmd-dpdk
-        $ make install T=x86_64-default-linuxapp-gcc
+            $ cd virtq-pmd-dpdk
+            $ make install T=x86_64-default-linuxapp-gcc
 
 - Start QEMU
 
- Before starting, users needs to mount hugetlbfs.
+ Before starting, users needs to mount hugetlbfs. For example, to reserve 4G of hugepage memory in the form of four 1G pages,
+ the following options should be passed to the kernel:
 
-        $ mount 
+        default_hugepagesz=1G hugepagesz=1G hugepages=4
+
+ Once the hugepage memory is reserved, to make the memory available for Intel DPDK use, perform the following steps:
+
+        $ mkdir /mnt/huge
+        $ mount -t hugetlbfs nodev /mnt/huge
 
  Here is an one of example to start guest with virtio-net-ipc-device.
 
@@ -80,9 +89,12 @@ As a result, virtq PMD can access to the buffers and queues directly. This is th
           -device virtio-net-ipc-pci,id=net0,mac=52:54:00:c6:a7:41,bus=pci.0,addr=0x09,nid=0,socketpath=/tmp/virtq,cinterval=1 \
           -net none -enable-kvm -vnc localhost:0
 
- Users can specify options used by virtio-net devices. Additionally following options can be specified.
+ Users can specify options used by virtio-net-ipc devices. Additionally following options can be specified.
+ - `virtio-net-ipc-pci` : Specify the virtual network device is "virtio-net-ipc device" with --device option.
+ - `id` : This is a uniq id in qemu internal.
+ - `mac` : Specify mac address of each virtual device.
  - `socketpath` : Specify where unix domain socket is. The socket is used by QEMU and virtq PMD.
- - `nid` : Specify a device identifier of the device. Nid should be unique among devices connected using same socketpath. Also it should be start from 0.
+ - `nid` : Specify a device identifier of the device. nid should be unique among devices connected using same socketpath. It should be started from 0. This id correspond to the suffix number "X" of "eth_virtqX" provided by virtq-pmd-dpdk.
  - `cinterval` : Specify reconnection interval when the counter part application is gone. Every cinterval seconds, virtio-net-ipc device tries to reconnect.
 
 
@@ -103,8 +115,9 @@ As a result, virtq PMD can access to the buffers and queues directly. This is th
 
  User can specify following options for virtq PMD.
  - `RTE_PMD_VIRTQ_CONNECTOR` : This has to be the same parameter as "socketpath" of QEMU.
+ - `eth_virtqX` : Specify virtual device is for "virtq PMD". The suffix number "X" of eth_virtqX must be started from 0 and incremented by one. "X" corresponds to "nid" provided by QEMU.
  - `mac` : Mac address of the device virtualized by virtq PMD.
- - `lcore_id` : Core id of event handler thread created by virtq PMD.
+ - `lcore_id` : Core id of event handler thread created by virtq PMD. This is optional.
 
  Internally, virtq PMD creates a thread to handle events come from unix domain socket.
 
@@ -151,13 +164,13 @@ Instruction is following:
 
  - lagopus
 
-        $ git clone https://github.com/lagopus/lagopus.git
-        $ cd lagopus
-        $ git checkout -b 0.1.1 refs/tags/v0.1.1
+            $ git clone https://github.com/lagopus/lagopus.git
+            $ cd lagopus
+            $ git checkout -b 0.1.1 refs/tags/v0.1.1
 
 - Apply patch to lagopus 0.1.1
  - patch file "lagopus.patch" is the following.
-```
+```diff
     --- lagopus/configure.ac	2015-01-28 00:39:47.713068317 +0900
     +++ configure.ac	2015-01-28 22:17:56.377004617 +0900
     @@ -253,6 +253,8 @@
@@ -173,31 +186,31 @@ Instruction is following:
 
  - Apply patch to configure.ac
 
-      $ patch < lagopus.patch
+            $ patch < lagopus.patch
 
  - re-generate configure
 
-      $ aclocal
-      $ autoheader
-      $ automake
-      $ autoconf
+            $ aclocal
+            $ autoheader
+            $ automake
+            $ autoconf
 
 - Compile
 
    here is in lagopus directory, and you have to set "RTE_SDK" environment variable to "virtq-pmd-dpdk" directory. And then type the following command.
 
-      $ ./configure --with-dpdk-dir=${RTE_SDK}
-      $ make
-      $ sudo make install
+            $ ./configure --with-dpdk-dir=${RTE_SDK}
+            $ make
+            $ sudo make install
 
  More details of options, see [lagopus documentations](https://github.com/lagopus/lagopus/blob/master/QUICKSTART.md).
 
 ###How to invoke virtq PMD from lagopus###
 
-- Here is an one of example which provides two virtual nic attached to lagopus. In this example, two physical nics are attached to DPDK igb_uio kernel module.
+- Here is an example which provides two virtual nic attached to lagopus. In this example, two physical nics are attached to DPDK igb_uio kernel module.
 
-      $ sudo RTE_PMD_VIRTQ_CONNECTOR=/tmp/virtq lagopus -d -- -c3 -n1 -m1024 --use-device 'eth_virtq0,eth_virtq1' -- -pf
-```
+            $ sudo RTE_PMD_VIRTQ_CONNECTOR=/tmp/virtq lagopus -d -- -c3 -n1 -m1024 --use-device 'eth_virtq0,eth_virtq1' -- -pf
+```json
 interface {
     ethernet {
         eth0;
