@@ -17,9 +17,9 @@ virtq PMD is a poll mode driver of DPDK, and virtio-net-ipc device is a kind of 
 ###Where can I download those from?###
 
 - DPDK-1.6.0-18 with virtq PMD
- - https://github.com/lagopus/virtq-pmd-dpdk
+ - https://github.com/lagopus/virtq-pmd-dpdk-1.6
 - QEMU-1.0 with virtio-net-ipc
- - https://github.com/lagopus/virtio-net-ipc-qemu1.0
+ - https://github.com/lagopus/virtio-net-ipc-qemu-1.0
 
 ###What are features?###
 
@@ -41,11 +41,11 @@ As a result, virtq PMD can access to the buffers and queues directly. This is th
 - Download
  - QEMU
 
-          $ git clone https://github.com/lagopus/virtio-net-ipc-qemu1.0.git
+          $ git clone https://github.com/lagopus/virtio-net-ipc-qemu-1.0.git
 
  - DPDK
 
-          $ git clone https://github.com/lagopus/virtq-pmd-dpdk.git
+          $ git clone https://github.com/lagopus/virtq-pmd-dpdk-1.6.git
 
 - Compile
  - QEMU
@@ -63,15 +63,15 @@ As a result, virtq PMD can access to the buffers and queues directly. This is th
 
  - DPDK
 
-          $ cd virtq-pmd-dpdk
+          $ cd virtq-pmd-dpdk-1.6
           $ make install T=x86_64-default-linuxapp-gcc
 
 - Start QEMU
 
- Before starting, users needs to mount hugetlbfs. For example, to reserve 4G of hugepage memory in the form of four 1G pages,
+ Before starting, users needs to mount hugetlbfs. For example, to reserve 10G of hugepage memory in the form of four 1G pages,
  the following options should be passed to the kernel:
 
-      default_hugepagesz=1G hugepagesz=1G hugepages=4
+      default_hugepagesz=1G hugepagesz=1G hugepages=10
 
  Once the hugepage memory is reserved, to make the memory available for Intel DPDK use, perform the following steps:
 
